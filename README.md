@@ -15,13 +15,13 @@ The Personal Finance Tracker is a simple web application that helps users manage
 5. Spending Analysis: A pie chart dynamically updates to reflect income vs. expenses.
 
 **Technologies Used**
-**HTML**: For structuring the web page.
+ **HTML**: For structuring the web page.
 
-**CSS**: For styling the application.
+ **CSS**: For styling the application.
 
-**JavaScript**: For interactive functionalities.
+ **JavaScript**: For interactive functionalities.
 
-**Chart.js**: To visualize spending analysis using a pie chart.
+ **Chart.js**: To visualize spending analysis using a pie chart.
 
 **How to Use**
 1. Open the index.html file in a web browser.
