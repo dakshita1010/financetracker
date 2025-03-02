@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2, h3 {
+            margin: 10px 0;
+        }
+
+        .transaction-form input, .transaction-form select, .transaction-form button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .transaction-form button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .transaction-form button:hover {
+            background: #218838;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #28a745;
+            color: white;
+        }
+
+        .income {
+            color: green;
+        }
+
+        .expense {
+            color: red;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Personal Finance Tracker</h2>
+        <div class="balance">
+            <h3>Balance: $<span id="balance">0.00</span></h3>
+        </div>
+        <div class="transaction-form">
+            <input type="text" id="description" placeholder="Description">
+            <input type="number" id="amount" placeholder="Amount">
+            <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button onclick="addTransaction()">Add</button>
+        </div>
+
+        <h3>Transactions</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="transaction-table">
+            </tbody>
+        </table>
+
+        <h3>Spending Analysis</h3>
+        <canvas id="chart" width="300" height="300"></canvas>
+    </div>
+
+    <script>
+        let balance = 0;
+        let incomeTotal = 0;
+        let expenseTotal = 0;
+        const balanceElement = document.getElementById("balance");
+        const transactionTable = document.getElementById("transaction-table");
+        const ctx = document.getElementById("chart").getContext("2d");
+
+        let chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Income', 'Expense'],
+                datasets: [{
+                    data: [0, 0],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        function updateChart() {
+            chart.data.datasets[0].data = [incomeTotal, expenseTotal];
+            chart.update();
+        }
+
+        function addTransaction() {
+            const description = document.getElementById("description").value;
+            const amount = parseFloat(document.getElementById("amount").value);
+            const type = document.getElementById("type").value;
+
+            if (description.trim() === "" || isNaN(amount) || amount <= 0) {
+                alert("Please enter valid details!");
+                return;
+            }
+
+            // Update balance
+            balance += type === "income" ? amount : -amount;
+            balanceElement.textContent = balance.toFixed(2);
+
+            // Update totals for pie chart
+            if (type === "income") {
+                incomeTotal += amount;
+            } else {
+                expenseTotal += amount;
+            }
+            updateChart();
+
+            // Add transaction to table
+            const row = transactionTable.insertRow();
+            row.innerHTML = `
+                <td>${description}</td>
+                <td>$${amount.toFixed(2)}</td>
+                <td class="${type}">${type}</td>
+                <td><button onclick="removeTransaction(this, ${amount}, '${type}')">❌</button></td>
+            `;
+            
+            // Clear input fields
+            document.getElementById("description").value = "";
+            document.getElementById("amount").value = "";
+        }
+
+        function removeTransaction(element, amount, type) {
+            balance += type === "income" ? -amount : amount;
+            balanceElement.textContent = balance.toFixed(2);
+
+            if (type === "income") {
+                incomeTotal -= amount;
+            } else {
+                expenseTotal -= amount;
+            }
+            updateChart();
+
+            element.parentElement.parentElement.remove();
+        }
+    </script>
+</body>
+</html>
